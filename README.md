@@ -5,27 +5,25 @@ A simple image generation based on next image prediction with LSTM - MNIST
 ## Model Architecture
 
 ```python
-def generator_model(optimizer):
-    model = Sequential()
+class Model(Sequential):
+    def __init__(self, optimizer, X_train, y_train, iters):
+        super().__init__()
 
-    model.add(LSTM(128, activation='relu', input_shape=(4, 28*28), return_sequences=True))
-    model.add(LSTM(64, activation='relu'))
+        self.add(LSTM(128, activation='relu', input_shape=(4, 28*28), return_sequences=True))
+        self.add(LSTM(64, activation='relu'))
+        self.add(Dense((28*28), activation='linear'))
+        self.add(Reshape((28, 28)))
 
-    model.add(Dense((28*28), activation='linear'))
-    model.add(Reshape((28, 28)))
-
-    model.compile(
-        optimizer=optimizer, loss='mean_squared_error', metrics='mse'
-    )
-    model.fit(X_train, y_train, epochs=1)
-
-    return model
+        self.compile(
+            optimizer=optimizer, loss='mean_squared_error', metrics=['mse']
+        )
+        self.fit(X_train, y_train, epochs=iters)
 ```
 
 Models output with different optimizers:
 
 ```python
-model = generator_model('sgd')
+model = Model(optimizer='adam', X_train=X_train, y_train=y_train, iters=2)
 ```
 
 ![rmsprop_output](./outputs/sgd0.png)
